@@ -15,6 +15,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "TBL_USUARIO")
 public class Usuario implements Serializable {
+	
+	//comentario de prueba
 
     private static final long serialVersionUID = 1L;
 
