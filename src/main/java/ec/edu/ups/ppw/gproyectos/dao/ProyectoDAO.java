@@ -23,7 +23,7 @@ public class ProyectoDAO {
         em.merge(proyecto);
     }
 
-    // Leer por ID (Codigo es int)
+    // Leer por id
     public Proyecto read(int codigo) {
         Proyecto p = em.find(Proyecto.class, codigo);
         return p;

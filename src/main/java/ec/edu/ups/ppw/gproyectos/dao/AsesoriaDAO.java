@@ -23,7 +23,7 @@ public class AsesoriaDAO {
         em.merge(asesoria);
     }
 
-    // Leer por ID (Codigo es int)
+    // Leer por id
     public Asesoria read(int codigo) {
         Asesoria a = em.find(Asesoria.class, codigo);
         return a;

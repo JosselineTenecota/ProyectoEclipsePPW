@@ -23,7 +23,7 @@ public class UsuarioDAO {
         em.merge(usuario);
     }
 
-    // Leer por ID (Cédula es String)
+    // Leer por id
     public Usuario read(String cedula) {
         Usuario u = em.find(Usuario.class, cedula);
         return u;
