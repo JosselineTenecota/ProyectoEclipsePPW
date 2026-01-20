@@ -7,6 +7,9 @@ import jakarta.inject.Inject;
 
 import ec.edu.ups.ppw.gproyectos.Usuario;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
+
+import java.util.List;
+
 import ec.edu.ups.ppw.gproyectos.Asesoria;
 
 import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
@@ -71,6 +74,10 @@ public class Demo {
         cita.setEstado("PENDIENTE");
         
         daoAsesoria.insert(cita);
+        List<Usuario> per=daoUsuario.getAll();
+        for(Usuario x:per) {
+        	System.out.println("datos "+x.getCedula());
+        }
         
         System.out.println("========== CARGA FINALIZADA CON ÉXITO ==========");
     }

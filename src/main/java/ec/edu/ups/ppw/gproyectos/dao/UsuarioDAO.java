@@ -1,11 +1,11 @@
 package ec.edu.ups.ppw.gproyectos.dao;
 
 import java.util.List;
+import ec.edu.ups.ppw.gproyectos.Usuario;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import ec.edu.ups.ppw.gproyectos.Usuario;
 
 @Stateless
 public class UsuarioDAO {
@@ -13,34 +13,28 @@ public class UsuarioDAO {
     @PersistenceContext
     private EntityManager em;
 
-    // Crear
-    public void insert(Usuario usuario) {
-        em.persist(usuario);
+    public void insert(Usuario u) { 
+    	em.persist(u); 
     }
-
-    // Actualizar
-    public void update(Usuario usuario) {
-        em.merge(usuario);
+    public void update(Usuario u) { 
+    	em.merge(u); 
     }
-
-    // Leer por id
-    public Usuario read(String cedula) {
-        Usuario u = em.find(Usuario.class, cedula);
-        return u;
+    public Usuario read(String correo) { 
+    	return em.find(Usuario.class, correo); 
     }
-
-    // Eliminar
-    public void delete(String cedula) {
-        Usuario u = em.find(Usuario.class, cedula);
-        if (u != null) {
-            em.remove(u);
+    
+    public Usuario getUsuarioPorCorreo(String correo) {
+        try {
+            String jpql = "SELECT u FROM Usuario u WHERE u.correo = :correo";
+            Query q = em.createQuery(jpql, Usuario.class);
+            q.setParameter("correo", correo);
+            return (Usuario) q.getSingleResult();
+        } catch (Exception e) {
+            return null;
         }
     }
-
-    // Listar todos
+    
     public List<Usuario> getAll() {
-        String jpql = "SELECT u FROM Usuario u";
-        Query q = em.createQuery(jpql, Usuario.class);
-        return q.getResultList();
+        return em.createQuery("SELECT u FROM Usuario u", Usuario.class).getResultList();
     }
 }

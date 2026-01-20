@@ -1,41 +1,92 @@
 package ec.edu.ups.ppw.gproyectos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.io.Serializable;
+import java.util.List;
+import jakarta.json.bind.annotation.JsonbTransient;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "TBL_PERSONA")
-public class Persona {
-	
-	@Id
-	@Column(name = "per_cedula", length = 10)
-	private String cedula;
-	
-	@Column(name = "per_nombre", length = 60)
-	private String nombre;
-	
-	@Column(name = "per_direccion")
-	private String direccion;
-	
-	public String getCedula() {
-		return cedula;
-	}
-	public void setCedula(String cedula) {
-		this.cedula = cedula;
-	}
-	public String getNombre() {
-		return nombre;
-	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	public String getDireccion() {
-		return direccion;
-	}
-	public void setDireccion(String direccion) {
-		this.direccion = direccion;
-	}
-	
-} 
+public class Persona implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @Column(name = "per_cedula", length = 10)
+    private String cedula;
+
+    @Column(name = "per_nombre")
+    private String nombre;
+
+    @Column(name = "per_direccion")
+    private String direccion;
+    
+    @Column(name = "per_descripcion", length = 500)
+    private String descripcion; // Bio del programador
+    
+    @Column(name = "per_foto")
+    private String fotoUrl;
+    
+    @Column(name = "per_especialidad")
+    private String especialidad;
+
+    // Un programador tiene muchos proyectos
+    @OneToMany(mappedBy = "programador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonbTransient 
+    private List<Proyecto> proyectos;
+
+    // Un programador tiene horarios definidos
+    @OneToMany(mappedBy = "programador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonbTransient
+    private List<Horario> horarios;
+
+    // Getters y Setters
+    public String getCedula() { 
+    	return cedula; 
+    }
+    public void setCedula(String cedula) { 
+    	this.cedula = cedula; 
+    }
+    public String getNombre() { 
+    	return nombre; 
+    }
+    public void setNombre(String nombre) { 
+    	this.nombre = nombre; 
+    }
+    public String getDireccion() { 
+    	return direccion; 
+    }
+    public void setDireccion(String direccion) { 
+    	this.direccion = direccion; 
+    }
+    public String getDescripcion() { 
+    	return descripcion; 
+    }
+    public void setDescripcion(String descripcion) { 
+    	this.descripcion = descripcion; 
+    }
+    public String getFotoUrl() { 
+    	return fotoUrl; 
+    }
+    public void setFotoUrl(String fotoUrl) { 
+    	this.fotoUrl = fotoUrl; 
+    }
+    public String getEspecialidad() { 
+    	return especialidad; 
+    }
+    public void setEspecialidad(String especialidad) { 
+    	this.especialidad = especialidad; 
+    }
+    public List<Proyecto> getProyectos() { 
+    	return proyectos; 
+    }
+    public void setProyectos(List<Proyecto> proyectos) { 
+    	this.proyectos = proyectos; 
+    }
+    public List<Horario> getHorarios() { 
+    	return horarios; 
+    }
+    public void setHorarios(List<Horario> horarios) { 
+    	this.horarios = horarios; 
+    }
+}
