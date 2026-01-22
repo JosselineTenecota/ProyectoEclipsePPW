@@ -1,105 +1,63 @@
 package ec.edu.ups.ppw.gproyectos.services;
 
 import java.util.List;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
+import ec.edu.ups.ppw.gproyectos.BUSSINES.GestionAsesorias;
+import ec.edu.ups.ppw.gproyectos.dto.SolicitudAsesoriaDTO;
 import ec.edu.ups.ppw.gproyectos.Asesoria;
-import ec.edu.ups.ppw.gproyectos.dao.AsesoriaDAO;
 
 @Path("asesorias")
 public class AsesoriaService {
 
     @Inject
-    private AsesoriaDAO dao;
+    private GestionAsesorias gestionAsesorias;
 
-    //listar
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listar() {
-        List<Asesoria> lista = dao.getAll();
-        return Response.ok(lista).build();
-    }
-    
-    //leer
-    @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response leer(@PathParam("id") int codigo) {
-        try {
-            Asesoria a = dao.read(codigo);
-            if(a == null) {
-                Error error = new Error(404, "No encontrado", "Asesoría " + codigo + " no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            return Response.ok(a).build();
-        } catch (Exception e) {
-            Error error = new Error(500, "Error interno", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
-        }
-    }
-
-    //crear
+    // 1. CREAR SOLICITUD
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response agendar(Asesoria a) {
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response solicitar(SolicitudAsesoriaDTO dto) {
         try {
-            a.setEstado("PENDIENTE"); 
-            dao.insert(a);
-            return Response.ok(a).build();
+            gestionAsesorias.crearSolicitud(dto);
+            return Response.ok("{\"mensaje\": \"Solicitud enviada y notificada al programador\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al agendar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            e.printStackTrace();
+            return Response.status(500).entity("{\"mensaje\": \"Error: " + e.getMessage() + "\"}").build();
         }
     }
-    
-    //actualizar
+
+    // 2. RESPONDER SOLICITUD (Aprobar/Rechazar)
+    // Url: PUT /asesorias/responder/5?estado=APROBADA&mensaje=TodoOk
     @PUT
-    @Path("{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response actualizar(@PathParam("id") int codigo, Asesoria a) {
+    @Path("/responder/{codigo}")
+    @Produces("application/json")
+    public Response responder(@PathParam("codigo") int codigo, 
+                              @QueryParam("estado") String estado,
+                              @QueryParam("mensaje") String mensaje) {
         try {
-            Asesoria existente = dao.read(codigo);
-            if (existente == null) {
-                Error error = new Error(404, "No encontrado", "Asesoría no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            a.setCodigo(codigo);
-            dao.update(a); 
-            return Response.ok(a).build();
+            gestionAsesorias.responderSolicitud(codigo, estado, mensaje);
+            return Response.ok("{\"mensaje\": \"Asesoría " + estado + " y cliente notificado\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al actualizar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error: " + e.getMessage() + "\"}").build();
         }
     }
-    
-    //eliminar
-    @DELETE
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response eliminar(@PathParam("id") int codigo) {
-        try {
-            Asesoria a = dao.read(codigo);
-            if (a == null) {
-                Error error = new Error(404, "No encontrado", "Asesoría no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            dao.delete(codigo);
-            return Response.noContent().build();
-        } catch (Exception e) {
-            Error error = new Error(500, "Error al eliminar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
-        }
+
+    // 3. LISTAR POR PROGRAMADOR
+    @GET
+    @Path("/programador/{cedula}")
+    @Produces("application/json")
+    public List<Asesoria> listarPorProgramador(@PathParam("cedula") String cedula) {
+        return gestionAsesorias.listarPorProgramador(cedula);
     }
 }

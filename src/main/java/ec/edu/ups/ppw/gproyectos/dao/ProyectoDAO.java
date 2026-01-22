@@ -5,6 +5,8 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+// IMPORTANTE: Si moviste tus entidades al paquete .model, ajusta este import:
+// import ec.edu.ups.ppw.gproyectos.model.Proyecto;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
 
 @Stateless
@@ -41,6 +43,19 @@ public class ProyectoDAO {
     public List<Proyecto> getAll() {
         String jpql = "SELECT p FROM Proyecto p";
         Query q = em.createQuery(jpql, Proyecto.class);
+        return q.getResultList();
+    }
+
+    // -------------------------------------------------------
+    // ESTE ES EL MÉTODO QUE TE FALTABA
+    // -------------------------------------------------------
+    public List<Proyecto> getProyectosPorUsuario(String cedula) {
+        // La consulta asume que Proyecto tiene 'programador' (Usuario) 
+        // y Usuario tiene 'persona' (Persona) donde está la 'cedula'.
+        String jpql = "SELECT p FROM Proyecto p WHERE p.programador.persona.cedula = :cedula";
+        
+        Query q = em.createQuery(jpql, Proyecto.class);
+        q.setParameter("cedula", cedula);
         return q.getResultList();
     }
 }

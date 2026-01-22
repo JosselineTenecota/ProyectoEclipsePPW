@@ -1,4 +1,4 @@
-package ec.edu.ups.ppw.gproyectos.BUSSINES;
+/*package ec.edu.ups.ppw.gproyectos.BUSSINES;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
@@ -81,4 +81,4 @@ public class Demo {
         
         System.out.println("========== CARGA FINALIZADA CON ÉXITO ==========");
     }
-}
+}*/

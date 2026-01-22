@@ -1,6 +1,7 @@
 package ec.edu.ups.ppw.gproyectos.services;
 
 import java.util.List;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -10,95 +11,80 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
-import ec.edu.ups.ppw.gproyectos.Proyecto;
+import ec.edu.ups.ppw.gproyectos.BUSSINES.GestionProyectos;
 import ec.edu.ups.ppw.gproyectos.dao.ProyectoDAO;
+import ec.edu.ups.ppw.gproyectos.Proyecto;
 
 @Path("proyectos")
 public class ProyectoService {
 
     @Inject
-    private ProyectoDAO dao;
-
-    //listar
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listar() {
-        List<Proyecto> lista = dao.getAll();
-        return Response.ok(lista).build();
-    }
+    private GestionProyectos gestionProyectos;
     
-    //leer
-    @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response leer(@PathParam("id") int codigo) {
-        try {
-            Proyecto p = dao.read(codigo);
-            if(p == null) {
-                Error error = new Error(404, "No encontrado", "Proyecto " + codigo + " no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            return Response.ok(p).build();
-        } catch (Exception e) {
-            Error error = new Error(500, "Error interno", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
-        }
-    }
+    @Inject
+    private ProyectoDAO proyectoDAO; // Para lecturas directas
 
-    //crear
+    // 1. CREAR PROYECTO
+    // Ejemplo de uso: POST /proyectos?correo=juan@mail.com
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response guardar(Proyecto p) {
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response crear(Proyecto proyecto, @QueryParam("correo") String correoProgramador) {
         try {
-            dao.insert(p);
-            return Response.ok(p).build();
+            if(correoProgramador == null) {
+                return Response.status(400).entity("{\"mensaje\": \"Falta indicar el correo del programador\"}").build();
+            }
+            
+            gestionProyectos.registrarProyecto(proyecto, correoProgramador);
+            return Response.ok("{\"mensaje\": \"Proyecto creado correctamente\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al guardar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error: " + e.getMessage() + "\"}").build();
         }
     }
-    
-    //actualizar
+
+    // 2. ACTUALIZAR PROYECTO
     @PUT
-    @Path("{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response actualizar(@PathParam("id") int codigo, Proyecto p) {
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response actualizar(Proyecto proyecto) {
         try {
-            Proyecto existente = dao.read(codigo);
-            if (existente == null) {
-                Error error = new Error(404, "No encontrado", "No se puede actualizar, proyecto no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            p.setCodigo(codigo);
-            dao.update(p);
-            return Response.ok(p).build();
+            gestionProyectos.actualizarProyecto(proyecto);
+            return Response.ok("{\"mensaje\": \"Proyecto actualizado\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al actualizar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error al actualizar\"}").build();
         }
     }
-    
-    //eliminar
+
+    // 3. ELIMINAR PROYECTO
     @DELETE
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response eliminar(@PathParam("id") int codigo) {
+    @Path("/{codigo}")
+    @Produces("application/json")
+    public Response eliminar(@PathParam("codigo") int codigo) {
         try {
-            Proyecto p = dao.read(codigo);
-            if(p == null) {
-                Error error = new Error(404, "No encontrado", "Proyecto no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            dao.delete(codigo);
-            return Response.noContent().build();
+            gestionProyectos.eliminarProyecto(codigo);
+            return Response.ok("{\"mensaje\": \"Proyecto eliminado\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al eliminar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error al eliminar\"}").build();
         }
+    }
+
+    // 4. LISTAR TODOS (Para la vista pública "Explorar")
+    @GET
+    @Produces("application/json")
+    public List<Proyecto> listarTodos() {
+        return gestionProyectos.listarTodos();
+    }
+
+    // 5. LISTAR POR PROGRAMADOR (Para el panel del programador)
+    // Ejemplo: GET /proyectos/usuario/100200300
+    // OJO: Aquí pasamos la Cédula (o ID de Persona) porque así lo definimos en el DAO anteriormente
+    @GET
+    @Path("/usuario/{cedula}")
+    @Produces("application/json")
+    public List<Proyecto> listarPorUsuario(@PathParam("cedula") String cedula) {
+        return proyectoDAO.getProyectosPorUsuario(cedula);
     }
 }

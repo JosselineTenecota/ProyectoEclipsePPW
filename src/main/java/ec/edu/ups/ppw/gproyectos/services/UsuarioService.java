@@ -1,6 +1,7 @@
 package ec.edu.ups.ppw.gproyectos.services;
 
 import java.util.List;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -10,118 +11,125 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import ec.edu.ups.ppw.gproyectos.Usuario;
+import ec.edu.ups.ppw.gproyectos.BUSSINES.GestionUsuarios;
 import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
+import ec.edu.ups.ppw.gproyectos.dto.RegistroDTO;
+import ec.edu.ups.ppw.gproyectos.Persona;
+import ec.edu.ups.ppw.gproyectos.Usuario;
 
 @Path("usuarios")
 public class UsuarioService {
 
     @Inject
-    private UsuarioDAO dao;
+    private GestionUsuarios gestionUsuarios;
+    
+    @Inject
+    private UsuarioDAO usuarioDAO;
 
-    //listar
-    @GET
-    @Produces("application/json")
-    public Response listar() {
-        List<Usuario> lista = dao.getAll();
-        return Response.ok(lista).build();
-    }
-    
-    // leer
-    @GET
-    @Path("{id}")
-    @Produces("application/json")
-    public Response leer(@PathParam("id") String cedula) {
-        try {
-            Usuario u = dao.read(cedula);
-            if (u == null) {
-                Error error = new Error(404, "No encontrado", "Usuario con cédula " + cedula + " no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-            return Response.ok(u).build();
-        } catch (Exception e) {
-            Error error = new Error(500, "Error interno", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
-        }
-    }
-    /*
-    
-    //buscar
-    @GET
-    @Path("/buscar")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response buscar(@QueryParam("cedula") String cedula) {
-        return leer(cedula); 
-    }
-*/
-    //crear
+    // 1. CREAR USUARIO (Registro)
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response crear(Usuario usuario) {
+    @Path("/crear")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response registrar(RegistroDTO dto) {
         try {
-            if (dao.read(usuario.getCedula()) != null) {
-                Error error = new Error(409, "Conflicto", "La cédula " + usuario.getCedula() + " ya existe.");
-                return Response.status(Response.Status.CONFLICT).entity(error).build();
+            if (dto.getCorreo() == null || dto.getPassword() == null || dto.getCedula() == null) {
+                return Response.status(400).entity("{\"mensaje\": \"Faltan datos obligatorios\"}").build();
             }
-            dao.insert(usuario);
-            return Response.ok(usuario).build();
+
+            Persona p = new Persona();
+            p.setCedula(dto.getCedula());
+            p.setNombre(dto.getNombre());
+            p.setDireccion("");
+            p.setDescripcion("");
+            p.setFotoUrl(""); 
+            
+            Usuario u = new Usuario();
+            u.setCorreo(dto.getCorreo());
+            u.setPassword(dto.getPassword()); 
+            u.setRol(dto.getRol() != null ? dto.getRol() : "CLIENTE");
+            u.setActivo(true);
+
+            gestionUsuarios.registrarUsuario(u, p);
+
+            return Response.ok("{\"mensaje\": \"Usuario registrado exitosamente\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al crear", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error al registrar: " + e.getMessage() + "\"}").build();
         }
     }
 
-    //actualizar
+    // 2. LISTAR TODOS (Para el panel de Admin)
+    @GET
+    @Produces("application/json")
+    public Response listarUsuarios() {
+        try {
+            List<Usuario> lista = usuarioDAO.getAll();
+            // Por seguridad, limpiamos los passwords antes de enviarlos
+            for(Usuario u : lista) {
+                u.setPassword(null); 
+            }
+            return Response.ok(lista).build();
+        } catch (Exception e) {
+            return Response.status(500).entity("{\"mensaje\": \"Error al listar\"}").build();
+        }
+    }
+
+    // 3. BUSCAR UNO POR CORREO (Para ver perfil)
+    @GET
+    @Path("/{correo}")
+    @Produces("application/json")
+    public Response buscarUsuario(@PathParam("correo") String correo) {
+        try {
+            Usuario u = usuarioDAO.read(correo);
+            if (u != null) {
+                u.setPassword(null); 
+                return Response.ok(u).build();
+            }
+            return Response.status(404).entity("{\"mensaje\": \"Usuario no encontrado\"}").build();
+        } catch (Exception e) {
+            return Response.status(500).entity("{\"mensaje\": \"Error al buscar\"}").build();
+        }
+    }
+
+    // 4. ACTUALIZAR CUENTA (Ej: Cambiar rol o contraseña)
     @PUT
-    @Path("{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response actualizar(@PathParam("id") String cedulaUrl, Usuario usuarioBody) {
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response actualizarUsuario(Usuario usuario) {
         try {
-            Usuario usuarioExistente = dao.read(cedulaUrl);
-            if (usuarioExistente == null) {
-                Error error = new Error(404, "No encontrado", "No se puede editar, el usuario " + cedulaUrl + " no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
-            }
-
-            if (!cedulaUrl.equals(usuarioBody.getCedula())) {
-                if (dao.read(usuarioBody.getCedula()) != null) {
-                    Error error = new Error(409, "Conflicto", "La nueva cédula ya está en uso.");
-                    return Response.status(Response.Status.CONFLICT).entity(error).build();
+            Usuario uExistente = usuarioDAO.read(usuario.getCorreo());
+            if (uExistente != null) {
+                if(usuario.getRol() != null) uExistente.setRol(usuario.getRol());
+                if(usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+                    uExistente.setPassword(usuario.getPassword());
                 }
-                dao.delete(cedulaUrl);
-                dao.insert(usuarioBody);
-            } else {
-                dao.update(usuarioBody);
+                
+                usuarioDAO.update(uExistente);
+                return Response.ok("{\"mensaje\": \"Usuario actualizado\"}").build();
             }
-            return Response.ok(usuarioBody).build();
+            return Response.status(404).entity("{\"mensaje\": \"Usuario no existe\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al actualizar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error al actualizar\"}").build();
         }
     }
 
-    //eliminar
+    // 5. ELIMINAR (Desactivar) USUARIO
     @DELETE
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response eliminar(@PathParam("id") String cedula) {
+    @Path("/{correo}")
+    @Produces("application/json")
+    public Response eliminarUsuario(@PathParam("correo") String correo) {
         try {
-            Usuario u = dao.read(cedula);
-            if (u == null) {
-                Error error = new Error(404, "No encontrado", "Usuario no existe.");
-                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
+            Usuario u = usuarioDAO.read(correo);
+            if (u != null) {
+                u.setActivo(false);
+                usuarioDAO.update(u);
+                return Response.ok("{\"mensaje\": \"Usuario desactivado correctamente\"}").build();
             }
-            dao.delete(cedula);
-            return Response.noContent().build();
+            return Response.status(404).entity("{\"mensaje\": \"Usuario no encontrado\"}").build();
         } catch (Exception e) {
-            Error error = new Error(500, "Error al eliminar", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(500).entity("{\"mensaje\": \"Error al eliminar\"}").build();
         }
     }
 }
