@@ -1,4 +1,4 @@
-/*package ec.edu.ups.ppw.gproyectos.BUSSINES;
+package ec.edu.ups.ppw.gproyectos.BUSSINES;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import ec.edu.ups.ppw.gproyectos.dao.AsesoriaDAO;
 import ec.edu.ups.ppw.gproyectos.dao.ProyectoDAO;
 import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
 
-//@Stateless
-/*public class GestionPortafolio {
+@Stateless
+public class GestionPortafolio {
 
     @Inject
     private UsuarioDAO daoUsuario;
@@ -55,9 +55,12 @@ import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
         daoAsesoria.insert(a);
         
         // Simulación Notificación al Programador
-        System.out.println(">>> [EMAIL SIMULADO] Para: " + a.getProgramador().getCorreo());
+
+        System.out.println(">>> [NOTIFICACIÓN SIMULADA]");
+        System.out.println(">>> Programador: " + a.getProgramador().getNombre());
         System.out.println(">>> Asunto: Nueva Solicitud de Asesoría");
         System.out.println(">>> Mensaje: El cliente " + a.getCliente().getNombre() + " quiere una cita.");
+
     }
 
     public void responderAsesoria(int codigoCita, String estado, String respuesta) throws Exception {
@@ -85,4 +88,4 @@ import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
         // Aquí deberías implementar el filtro en el DAO, por ahora devolvemos todas para probar
         return daoAsesoria.getAll(); 
     }
-}*/
+}
