@@ -15,19 +15,18 @@ public class Horario implements Serializable {
     private int id;
 
     @Column(name = "hor_dia_semana")
-    private String diaSemana; // Lunes, Martes...
+    private String diaSemana;
 
     @Column(name = "hor_hora_inicio")
-    private String horaInicio; // "08:00"
+    private String horaInicio;
 
     @Column(name = "hor_hora_fin")
-    private String horaFin;   // "12:00"
+    private String horaFin;
 
     @ManyToOne
     @JoinColumn(name = "per_programador_fk")
     private Persona programador;
 
-    // Getters y Setters
     public int getId() { 
     	return id; 
     }

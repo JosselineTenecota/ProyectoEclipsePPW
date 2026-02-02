@@ -1,6 +1,7 @@
 package ec.edu.ups.ppw.gproyectos;
 
 import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,86 +18,105 @@ public class Proyecto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pro_codigo")
     private int codigo;
-
+    
     @Column(name = "pro_titulo")
     private String titulo;
 
     @Column(name = "pro_descripcion")
-    private String descripcion; 
-    
+    private String descripcion;
+
     @Column(name = "pro_tipo")
-    private String tipo; 
-    
+    private String tipo;
+
     @Column(name = "pro_participacion")
-    private String participacion; 
+    private String participacion;
 
     @Column(name = "pro_tecnologias")
-    private String tecnologias; 
+    private String tecnologias;
 
     @Column(name = "pro_url_repo")
-    private String urlRepo; 
+    private String urlRepo;
 
     @Column(name = "pro_url_deploy")
-    private String urlDeploy; 
+    private String urlDeploy;
 
     @ManyToOne
-    @JoinColumn(name = "pro_usuario_fk")
-    private Usuario programador;
+    @JoinColumn(name = "pro_persona_fk")
+    private Persona programador;
 
-    public int getCodigo() { return codigo; }
-    public void setCodigo(int codigo) { 
-    	this.codigo = codigo; 
+
+    public int getCodigo() {
+        return codigo;
     }
-    
-    public String getTitulo() { 
-    	return titulo; }
-    public void setTitulo(String titulo) { 
-    	this.titulo = titulo; 
+
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
     }
-    
-    public String getDescripcion() { 
-    	return descripcion; 
+
+    public String getTitulo() {
+        return titulo;
     }
-    public void setDescripcion(String descripcion) { 
-    	this.descripcion = descripcion; 
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
-    
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { 
-    	this.tipo = tipo; 
+
+    public String getDescripcion() {
+        return descripcion;
     }
-    
-    public String getParticipacion() { 
-    	return participacion; 
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
-    public void setParticipacion(String participacion) { 
-    	this.participacion = participacion; 
+
+    public String getTipo() {
+        return tipo;
     }
-    
-    public String getTecnologias() { 
-    	return tecnologias; 
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
-    public void setTecnologias(String tecnologias) { 
-    	this.tecnologias = tecnologias; 
+
+    public String getParticipacion() {
+        return participacion;
     }
-    
-    public String getUrlRepo() { return urlRepo; }
-    public void setUrlRepo(String urlRepo) { 
-    	this.urlRepo = urlRepo; 
+
+    public void setParticipacion(String participacion) {
+        this.participacion = participacion;
     }
-    
-    public String getUrlDeploy() { return urlDeploy; }
-    public void setUrlDeploy(String urlDeploy) { 
-    	this.urlDeploy = urlDeploy; 
+
+    public String getTecnologias() {
+        return tecnologias;
     }
-    
-    public Usuario getProgramador() { 
-    	return programador; 
+
+    public void setTecnologias(String tecnologias) {
+        this.tecnologias = tecnologias;
     }
-    public void setProgramador(Usuario programador) { 
-    	this.programador = programador; 
+
+    public String getUrlRepo() {
+        return urlRepo;
+    }
+
+    public void setUrlRepo(String urlRepo) {
+        this.urlRepo = urlRepo;
+    }
+
+    public String getUrlDeploy() {
+        return urlDeploy;
+    }
+
+    public void setUrlDeploy(String urlDeploy) {
+        this.urlDeploy = urlDeploy;
+    }
+
+    public Persona getProgramador() {
+        return programador;
+    }
+
+    public void setProgramador(Persona programador) {
+        this.programador = programador;
     }
 }

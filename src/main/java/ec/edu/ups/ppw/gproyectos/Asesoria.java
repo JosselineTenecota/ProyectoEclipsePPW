@@ -19,16 +19,16 @@ public class Asesoria implements Serializable {
     private String tema;
 
     @Column(name = "ase_fecha_hora")
-    private LocalDateTime fechaHora; // Cambio clave: LocalDateTime en vez de String
+    private LocalDateTime fechaHora;
 
     @Column(name = "ase_estado")
-    private String estado; // PENDIENTE, APROBADA, RECHAZADA
+    private String estado; //pendiente, probada, rechazada
 
     @Column(name = "ase_mensaje_prog")
     private String mensajeProgramador;
 
     @ManyToOne
-    @JoinColumn(name = "per_cliente_fk") // Relacionamos con PERSONA, no usuario directo
+    @JoinColumn(name = "per_cliente_fk") //relacion con persona
     private Persona cliente;
 
     @ManyToOne
