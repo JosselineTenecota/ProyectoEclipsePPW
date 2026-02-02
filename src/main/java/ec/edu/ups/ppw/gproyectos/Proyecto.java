@@ -43,10 +43,19 @@ public class Proyecto implements Serializable {
     @Column(name = "pro_url_deploy")
     private String urlDeploy;
 
+    // 🔥 RELACIÓN CORRECTA
     @ManyToOne
+<<<<<<< HEAD
     @JoinColumn(name = "pro_persona_fk")
+=======
+    @JoinColumn(name = "programador_id")
+>>>>>>> branch 'main' of https://github.com/JosselineTenecota/ProyectoEclipsePPW.git
     private Persona programador;
 
+<<<<<<< HEAD
+=======
+    // ================= GETTERS & SETTERS =================
+>>>>>>> branch 'main' of https://github.com/JosselineTenecota/ProyectoEclipsePPW.git
 
     public int getCodigo() {
         return codigo;

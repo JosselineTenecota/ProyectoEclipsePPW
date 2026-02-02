@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 public class Asesoria implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+//Verificacion de asesorias
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ase_codigo")
@@ -76,5 +76,6 @@ public class Asesoria implements Serializable {
     }
     public void setProgramador(Persona programador) { 
     	this.programador = programador; 
+    	
     }
 }
