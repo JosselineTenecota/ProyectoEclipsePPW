@@ -2,8 +2,6 @@ package ec.edu.ups.ppw.gproyectos;
 
 import java.io.Serializable;
 import java.util.List;
-
-import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.json.bind.annotation.JsonbTransient;
 
 @Entity
 @Table(name = "TBL_PERSONA")
@@ -37,7 +36,6 @@ public class Persona implements Serializable {
     @Column(name = "per_especialidad")
     private String especialidad;
 
-    // Usamos JsonbTransient para evitar LazyInitializationException al serializar a JSON
     @OneToMany(mappedBy = "programador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonbTransient
     private List<Proyecto> proyectos;
@@ -46,7 +44,7 @@ public class Persona implements Serializable {
     @JsonbTransient
     private List<Horario> horarios;
 
-    // ===== GETTERS & SETTERS =====
+    // ===== GETTERS & SETTERS ESTÁNDAR =====
 
     public String getCedula() {
         return cedula;
@@ -96,7 +94,10 @@ public class Persona implements Serializable {
         this.especialidad = especialidad;
     }
 
-    public List<Proyecto> getProyectos() {
+    // ===== TRUCO: CAMBIO DE NOMBRE EN GETTERS PARA EVITAR EL ERROR 400 =====
+    // Al renombrar 'getProyectos' a 'fetchProyectos', Jackson lo ignora en el JSON
+    
+    public List<Proyecto> fetchProyectos() {
         return proyectos;
     }
 
@@ -104,7 +105,7 @@ public class Persona implements Serializable {
         this.proyectos = proyectos;
     }
 
-    public List<Horario> getHorarios() {
+    public List<Horario> fetchHorarios() {
         return horarios;
     }
 
