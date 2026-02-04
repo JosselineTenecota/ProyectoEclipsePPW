@@ -294,6 +294,30 @@
                     <artifactId>wildfly-arquillian-container-remote</artifactId>
                     <scope>test</scope>
                 </dependency>
+				                <!-- ========================================================== -->
+				<!-- DEPENDENCIA PRINCIPAL JAKARTA EE (RECOMENDADA)             -->
+				<!-- ========================================================== -->
+				<dependency>
+				    <groupId>jakarta.platform</groupId>
+				    <artifactId>jakarta.jakartaee-api</artifactId>
+				    <version>10.0.0</version>
+				    <scope>provided</scope>
+				</dependency>
+				
+				
+				<!-- ========================================================== -->
+				<!-- DRIVER POSTGRESQL (SOLO PARA COMPILACIÓN / TEST)           -->
+				<!-- ========================================================== -->
+				<dependency>
+				    <groupId>org.postgresql</groupId>
+				    <artifactId>postgresql</artifactId>
+				    <version>42.7.3</version>
+				    <scope>runtime</scope>
+				</dependency>
+
+                
+                
+                
             </dependencies>
             <build>
                 <plugins>

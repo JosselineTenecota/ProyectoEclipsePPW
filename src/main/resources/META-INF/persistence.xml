@@ -1,32 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="3.0"
-   xmlns="https://jakarta.ee/xml/ns/persistence"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="
-        https://jakarta.ee/xml/ns/persistence
-        https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
-
-   <persistence-unit name="gproyectosPersistenceUnit" transaction-type="JTA">
-
-      <!-- 🔥 CONEXIÓN A TU DATASOURCE DE POSTGRES -->
-      <jta-data-source>java:jboss/datasources/ejPostgresDS</jta-data-source>
-
-      <properties>
-
-         <!-- ⚙ GENERACIÓN DE ESQUEMA -->
-         <property name="jakarta.persistence.schema-generation.database.action" value="update"/>      
-
-         <property name="jakarta.persistence.schema-generation.create-source" value="metadata"/>
-         <property name="jakarta.persistence.schema-generation.drop-source" value="metadata"/>
-
-         <!-- 🔥 ESTA ES LA NUEVA PROPIEDAD -->
-         <property name="hibernate.hbm2ddl.auto" value="update"/>
-
-         <!-- 📝 MOSTRAR SQL EN CONSOLA -->
-         <property name="hibernate.show_sql" value="true"/>
-         <property name="hibernate.format_sql" value="true"/>
-
-      </properties>
-   </persistence-unit>
-
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    
+    <persistence-unit name="gproyectosPersistenceUnit" transaction-type="JTA">
+        <!-- ESTA LINEA ES LA CLAVE -->
+        <jta-data-source>java:jboss/datasources/ejPostgresDS</jta-data-source>
+        
+        <properties>
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+        </properties>
+    </persistence-unit>
 </persistence>
