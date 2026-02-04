@@ -37,12 +37,11 @@ public class Persona implements Serializable {
     @Column(name = "per_especialidad")
     private String especialidad;
 
-    // Un programador (Persona) tiene muchos proyectos
+    // Usamos JsonbTransient para evitar LazyInitializationException al serializar a JSON
     @OneToMany(mappedBy = "programador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonbTransient
     private List<Proyecto> proyectos;
 
-    // Un programador (Persona) tiene muchos horarios
     @OneToMany(mappedBy = "programador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonbTransient
     private List<Horario> horarios;
