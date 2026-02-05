@@ -143,4 +143,27 @@ public class UsuarioService {
 			u.getPersona().setHorarios(null);
 		}
 	}
+	
+	@GET // Asegúrate de que esta línea esté presente
+	@Path("/programadores") // Asegúrate de que tenga el slash inicial
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listarProgramadores() {
+	    try {
+	        // Tu lógica de filtrado aquí
+	        List<Usuario> lista = usuarioDAO.getAll();
+	        List<Usuario> programadores = lista.stream()
+	            .filter(u -> u.getRol() != null && u.getRol().equalsIgnoreCase("PROGRAMADOR"))
+	            .toList();
+
+	        for (Usuario u : programadores) {
+	            u.setPassword(null);
+	            limpiarProxies(u);
+	        }
+	        return Response.ok(programadores).build();
+	    } catch (Exception e) {
+	        return Response.status(500).entity(e.getMessage()).build();
+	    }
+	}
+	
+	
 }
