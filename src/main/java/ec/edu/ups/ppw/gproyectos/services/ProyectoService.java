@@ -5,37 +5,34 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
 import ec.edu.ups.ppw.gproyectos.BUSSINES.GestionProyectos;
 import ec.edu.ups.ppw.gproyectos.dao.ProyectoDAO;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
 
-@Path("proyectos") // Esta es la ruta base: /api/proyectos
+@Path("proyectos")
 public class ProyectoService {
-
+    
     @Inject
     private GestionProyectos gestionProyectos;
     
     @Inject
     private ProyectoDAO proyectoDAO;
 
-    // 1. CREAR PROYECTO
-    // CORRECCIÓN: Se elimina el @Path("proyectos") interno para que la ruta sea simplemente /proyectos
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response guardar(Proyecto proyecto, @QueryParam("correo") String correo) {
+    public Response guardar(Proyecto proyecto, @QueryParam("cedula") String cedula) {
         try {
-            // Este método llama a gestionProyectos que ahora tiene el @JoinColumn(name="programador_id")
-            gestionProyectos.registrarProyecto(proyecto, correo);
+            if (cedula == null || cedula.isEmpty()) {
+                return Response.status(400).entity("{\"error\": \"Cédula obligatoria\"}").build();
+            }
+            gestionProyectos.registrarProyecto(proyecto, cedula);
             return Response.ok(proyecto).build();
         } catch (Exception e) {
-            // Si el programador_id sigue llegando null, este error 500 saldrá aquí
             return Response.status(500).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
         }
     }
 
-    // 2. ACTUALIZAR PROYECTO
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -48,7 +45,6 @@ public class ProyectoService {
         }
     }
 
-    // 3. ELIMINAR PROYECTO
     @DELETE
     @Path("/{codigo}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -61,18 +57,14 @@ public class ProyectoService {
         }
     }
 
-    // 4. LISTAR TODOS
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Proyecto> listarTodos() {
-        return gestionProyectos.listarTodos();
-    }
-
-    // 5. LISTAR POR PROGRAMADOR
     @GET
     @Path("/usuario/{cedula}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Proyecto> listarPorUsuario(@PathParam("cedula") String cedula) {
-        return proyectoDAO.getProyectosPorUsuario(cedula);
+    public Response listarPorUsuario(@PathParam("cedula") String cedula) {
+        if (cedula == null || cedula.trim().isEmpty() || cedula.equals("null")) {
+             return Response.status(400).entity("{\"error\": \"Cédula inválida\"}").build();
+        }
+        List<Proyecto> lista = proyectoDAO.getProyectosPorUsuario(cedula);
+        return Response.ok(lista != null ? lista : "[]").build();
     }
 }

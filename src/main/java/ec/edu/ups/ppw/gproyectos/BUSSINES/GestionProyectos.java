@@ -7,7 +7,6 @@ import ec.edu.ups.ppw.gproyectos.dao.ProyectoDAO;
 import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
 import ec.edu.ups.ppw.gproyectos.Usuario;
-import ec.edu.ups.ppw.gproyectos.Persona;
 
 @Stateless
 public class GestionProyectos {
@@ -18,17 +17,18 @@ public class GestionProyectos {
     @Inject
     private UsuarioDAO usuarioDAO;
 
-    public void registrarProyecto(Proyecto proyecto, String correo) throws Exception {
-        System.out.println("Intentando registrar proyecto para correo: " + correo);
-        Usuario u = usuarioDAO.read(correo);
+    public void registrarProyecto(Proyecto proyecto, String cedula) throws Exception {
+        // Buscamos al usuario por cédula para obtener la relación Persona
+        Usuario u = usuarioDAO.read(cedula);
         
         if (u == null || u.getPersona() == null) {
-            throw new Exception("Error: No se encontró la Persona vinculada al correo: " + correo);
+            throw new Exception("No se encontró el programador vinculado a la cédula: " + cedula);
         }
         
-        System.out.println("Persona encontrada: " + u.getPersona().getCedula()); 
+        // Seteamos la relación (la llave foránea en Postgres)
         proyecto.setProgramador(u.getPersona());
         
+        // Guardamos el objeto completo con todos sus atributos
         proyectoDAO.insert(proyecto);
     }
 
@@ -42,9 +42,5 @@ public class GestionProyectos {
 
     public List<Proyecto> listarTodos() {
         return proyectoDAO.getAll();
-    }
-
-    public List<Proyecto> listarPorProgramador(String cedula) {
-        return proyectoDAO.getProyectosPorUsuario(cedula);
     }
 }

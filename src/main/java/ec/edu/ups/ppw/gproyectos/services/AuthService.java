@@ -25,51 +25,86 @@ public class AuthService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(LoginDTO loginDto) {
         try {
-            // 1. Validar que vengan datos
             if (loginDto.getCorreo() == null || loginDto.getPassword() == null) {
                 return Response.status(400).entity("{\"mensaje\": \"Correo y contraseña son requeridos\"}").build();
             }
 
-            // 2. Buscar usuario en la BD (Usamos el método optimizado que creamos antes)
             Usuario usuario = usuarioDAO.getUsuarioPorCorreo(loginDto.getCorreo());
 
             if (usuario == null) {
                 return Response.status(401).entity("{\"mensaje\": \"Credenciales incorrectas (Usuario no existe)\"}").build();
             }
 
-            // 3. Verificar contraseña 
-            // NOTA: Para fase 2 final, aquí deberías usar BCrypt.checkpw(...)
             if (!usuario.getPassword().equals(loginDto.getPassword())) {
                 return Response.status(401).entity("{\"mensaje\": \"Credenciales incorrectas (Password mal)\"}").build();
             }
             
-            // 4. Verificar si está activo
             if (!usuario.isActivo()) {
                 return Response.status(403).entity("{\"mensaje\": \"La cuenta está inactiva.\"}").build();
             }
 
-            // 5. Generar Token
-            // Obtenemos el nombre de la Persona asociada (si existe)
-            String nombre = "Usuario";
-            if (usuario.getPersona() != null) {
-                nombre = usuario.getPersona().getNombre();
-            }
-
-            String token = TokenUtils.generateToken(usuario.getCorreo(), nombre, usuario.getRol());
-
-            // 6. Responder con JSON
-            // Devolvemos el token, el rol y el usuario para que Angular los guarde
-            return Response.ok()
-                    .entity("{"
-                            + "\"token\": \"" + token + "\", "
-                            + "\"rol\": \"" + usuario.getRol() + "\", "
-                            + "\"usuario\": \"" + usuario.getCorreo() + "\""
-                            + "}")
-                    .build();
+            return construirRespuestaExitosa(usuario);
 
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(500).entity("{\"mensaje\": \"Error interno del servidor\"}").build();
         }
+    }
+
+    @POST
+    @Path("/login-social")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loginSocial(LoginDTO loginDto) {
+        try {
+            if (loginDto.getCorreo() == null) {
+                return Response.status(400).entity("{\"mensaje\": \"Correo es requerido\"}").build();
+            }
+
+            Usuario usuario = usuarioDAO.getUsuarioPorCorreo(loginDto.getCorreo());
+
+            if (usuario == null) {
+                return Response.status(404).entity("{\"mensaje\": \"Usuario no registrado en el sistema local\"}").build();
+            }
+
+            return construirRespuestaExitosa(usuario);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("{\"mensaje\": \"Error en login social\"}").build();
+        }
+    }
+
+    private Response construirRespuestaExitosa(Usuario usuario) {
+        String cedula = "";
+        String nombre = "Usuario";
+
+        // Mantenemos tus mapeos corregidos para evitar errores de compilación
+        if (usuario.getPersona() != null) {
+            cedula = usuario.getPersona().getCedula(); // Atributo en Java
+            nombre = usuario.getPersona().getNombre(); // Atributo en Java
+            
+            // Mantenemos tu funcionalidad de bloqueo por cédula temporal "SOC-"
+            if (cedula != null && cedula.startsWith("SOC-")) {
+                return Response.status(403)
+                    .entity("{\"mensaje\": \"Debe completar su registro con una cédula real (actualmente: " + cedula + ")\"}")
+                    .build();
+            }
+        } else {
+            return Response.status(400).entity("{\"mensaje\": \"Usuario sin datos de persona vinculados\"}").build();
+        }
+
+        String token = TokenUtils.generateToken(usuario.getCorreo(), nombre, usuario.getRol());
+
+        // Retornamos el JSON con los campos exactos que Angular busca para llenar los paréntesis ()
+        return Response.ok()
+                .entity("{"
+                        + "\"token\": \"" + token + "\", "
+                        + "\"rol\": \"" + usuario.getRol() + "\", "
+                        + "\"correo\": \"" + usuario.getCorreo() + "\", "
+                        + "\"nombre\": \"" + nombre + "\", "
+                        + "\"cedula\": \"" + cedula + "\""
+                        + "}")
+                .build();
     }
 }
