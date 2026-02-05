@@ -3,52 +3,64 @@ package ec.edu.ups.ppw.gproyectos.dto;
 import java.io.Serializable;
 
 public class RegistroDTO implements Serializable {
-    
+    private static final long serialVersionUID = 1L;
+
     // Datos de la Persona
     private String cedula;
     private String nombre;
-    private String apellido; // Opcional, si lo tienes en tu modelo
-    
+    private String apellido; 
+    private String telefono; // <--- AGREGADO PARA WHATSAPP
+
     // Datos del Usuario (Cuenta)
     private String correo;
     private String password;
-    private String rol; // "ADMIN", "PROGRAMADOR", "CLIENTE"
+    private String rol; 
+
+    // Constructor vacío obligatorio para Jackson
+    public RegistroDTO() {
+    }
 
     // Getters y Setters
     public String getCedula() { 
-    	return cedula; 
+        return cedula; 
     }
     public void setCedula(String cedula) { 
-    	this.cedula = cedula; 
+        this.cedula = cedula; 
     }
     public String getNombre() { 
-    	return nombre; 
+        return nombre; 
     }
     public void setNombre(String nombre) { 
-    	this.nombre = nombre; 
+        this.nombre = nombre; 
     }
     public String getApellido() { 
-    	return apellido; 
+        return apellido; 
     }
     public void setApellido(String apellido) { 
-    	this.apellido = apellido; 
+        this.apellido = apellido; 
+    }
+    public String getTelefono() { 
+        return telefono; 
+    }
+    public void setTelefono(String telefono) { 
+        this.telefono = telefono; 
     }
     public String getCorreo() { 
-    	return correo; 
+        return correo; 
     }
     public void setCorreo(String correo) { 
-    	this.correo = correo; 
+        this.correo = correo; 
     }
     public String getPassword() { 
-    	return password; 
+        return password; 
     }
     public void setPassword(String password) { 
-    	this.password = password; 
+        this.password = password; 
     }
     public String getRol() { 
-    	return rol; 
+        return rol; 
     }
     public void setRol(String rol) { 
-    	this.rol = rol; 
+        this.rol = rol; 
     }
 }

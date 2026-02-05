@@ -43,6 +43,19 @@ public class Persona implements Serializable {
     @OneToMany(mappedBy = "programador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonbTransient
     private List<Horario> horarios;
+ // Dentro de Persona.java
+    @Column(name = "per_telefono") // Asegúrate que este nombre coincida con tu tabla en Postgres
+    private String telefono;
+
+    // Getter y Setter
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+    
 
     // ===== GETTERS & SETTERS ESTÁNDAR =====
 
