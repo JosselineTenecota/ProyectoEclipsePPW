@@ -1,15 +1,7 @@
 package ec.edu.ups.ppw.gproyectos;
 
 import java.io.Serializable;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "TBL_PROYECTO")
@@ -43,81 +35,29 @@ public class Proyecto implements Serializable {
     @Column(name = "pro_url_deploy")
     private String urlDeploy;
 
+
     @ManyToOne
     @JoinColumn(name = "programador_id", nullable = false)
     private Persona programador;
 
-    // ================= GETTERS & SETTERS =================
+    public Proyecto() {}
 
-    public int getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(int codigo) {
-        this.codigo = codigo;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getParticipacion() {
-        return participacion;
-    }
-
-    public void setParticipacion(String participacion) {
-        this.participacion = participacion;
-    }
-
-    public String getTecnologias() {
-        return tecnologias;
-    }
-
-    public void setTecnologias(String tecnologias) {
-        this.tecnologias = tecnologias;
-    }
-
-    public String getUrlRepo() {
-        return urlRepo;
-    }
-
-    public void setUrlRepo(String urlRepo) {
-        this.urlRepo = urlRepo;
-    }
-
-    public String getUrlDeploy() {
-        return urlDeploy;
-    }
-
-    public void setUrlDeploy(String urlDeploy) {
-        this.urlDeploy = urlDeploy;
-    }
-
-    public Persona getProgramador() {
-        return programador;
-    }
-
-    public void setProgramador(Persona programador) {
-        this.programador = programador;
-    }
+    public int getCodigo() { return codigo; }
+    public void setCodigo(int codigo) { this.codigo = codigo; }
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+    public String getParticipacion() { return participacion; }
+    public void setParticipacion(String participacion) { this.participacion = participacion; }
+    public String getTecnologias() { return tecnologias; }
+    public void setTecnologias(String tecnologias) { this.tecnologias = tecnologias; }
+    public String getUrlRepo() { return urlRepo; }
+    public void setUrlRepo(String urlRepo) { this.urlRepo = urlRepo; }
+    public String getUrlDeploy() { return urlDeploy; }
+    public void setUrlDeploy(String urlDeploy) { this.urlDeploy = urlDeploy; }
+    public Persona getProgramador() { return programador; }
+    public void setProgramador(Persona programador) { this.programador = programador; }
 }

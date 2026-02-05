@@ -1,54 +1,44 @@
 package ec.edu.ups.ppw.gproyectos.services;
 
 import java.util.List;
-
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import ec.edu.ups.ppw.gproyectos.BUSSINES.GestionProyectos;
 import ec.edu.ups.ppw.gproyectos.dao.ProyectoDAO;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
 
-@Path("proyectos")
+@Path("proyectos") // Esta es la ruta base: /api/proyectos
 public class ProyectoService {
 
     @Inject
     private GestionProyectos gestionProyectos;
     
     @Inject
-    private ProyectoDAO proyectoDAO; // Para lecturas directas
+    private ProyectoDAO proyectoDAO;
 
     // 1. CREAR PROYECTO
-    // Ejemplo de uso: POST /proyectos?correo=juan@mail.com
+    // CORRECCIÓN: Se elimina el @Path("proyectos") interno para que la ruta sea simplemente /proyectos
     @POST
-    @Consumes("application/json")
-    @Produces("application/json")
-    public Response crear(Proyecto proyecto, @QueryParam("correo") String correoProgramador) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response guardar(Proyecto proyecto, @QueryParam("correo") String correo) {
         try {
-            if(correoProgramador == null) {
-                return Response.status(400).entity("{\"mensaje\": \"Falta indicar el correo del programador\"}").build();
-            }
-            
-            gestionProyectos.registrarProyecto(proyecto, correoProgramador);
-            return Response.ok("{\"mensaje\": \"Proyecto creado correctamente\"}").build();
+            // Este método llama a gestionProyectos que ahora tiene el @JoinColumn(name="programador_id")
+            gestionProyectos.registrarProyecto(proyecto, correo);
+            return Response.ok(proyecto).build();
         } catch (Exception e) {
-            return Response.status(500).entity("{\"mensaje\": \"Error: " + e.getMessage() + "\"}").build();
+            // Si el programador_id sigue llegando null, este error 500 saldrá aquí
+            return Response.status(500).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
         }
     }
 
     // 2. ACTUALIZAR PROYECTO
     @PUT
-    @Consumes("application/json")
-    @Produces("application/json")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response actualizar(Proyecto proyecto) {
         try {
             gestionProyectos.actualizarProyecto(proyecto);
@@ -61,7 +51,7 @@ public class ProyectoService {
     // 3. ELIMINAR PROYECTO
     @DELETE
     @Path("/{codigo}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response eliminar(@PathParam("codigo") int codigo) {
         try {
             gestionProyectos.eliminarProyecto(codigo);
@@ -71,19 +61,17 @@ public class ProyectoService {
         }
     }
 
-    // 4. LISTAR TODOS (Para la vista pública "Explorar")
+    // 4. LISTAR TODOS
     @GET
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Proyecto> listarTodos() {
         return gestionProyectos.listarTodos();
     }
 
-    // 5. LISTAR POR PROGRAMADOR (Para el panel del programador)
-    // Ejemplo: GET /proyectos/usuario/100200300
-    // OJO: Aquí pasamos la Cédula (o ID de Persona) porque así lo definimos en el DAO anteriormente
+    // 5. LISTAR POR PROGRAMADOR
     @GET
     @Path("/usuario/{cedula}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Proyecto> listarPorUsuario(@PathParam("cedula") String cedula) {
         return proyectoDAO.getProyectosPorUsuario(cedula);
     }

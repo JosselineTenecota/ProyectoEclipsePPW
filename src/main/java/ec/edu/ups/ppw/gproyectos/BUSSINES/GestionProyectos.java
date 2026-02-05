@@ -1,10 +1,8 @@
 package ec.edu.ups.ppw.gproyectos.BUSSINES;
 
 import java.util.List;
-
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-
 import ec.edu.ups.ppw.gproyectos.dao.ProyectoDAO;
 import ec.edu.ups.ppw.gproyectos.dao.UsuarioDAO;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
@@ -20,45 +18,33 @@ public class GestionProyectos {
     @Inject
     private UsuarioDAO usuarioDAO;
 
-    // Crear un proyecto y asignarlo a un programador
-    public void registrarProyecto(Proyecto proyecto, String correoProgramador) throws Exception {
-
-        // 1️⃣ Buscamos el usuario
-        Usuario u = usuarioDAO.read(correoProgramador);
-        if (u == null) {
-            throw new Exception("El usuario no existe.");
+    public void registrarProyecto(Proyecto proyecto, String correo) throws Exception {
+        System.out.println("Intentando registrar proyecto para correo: " + correo);
+        Usuario u = usuarioDAO.read(correo);
+        
+        if (u == null || u.getPersona() == null) {
+            throw new Exception("Error: No se encontró la Persona vinculada al correo: " + correo);
         }
-
-        // 2️⃣ Obtenemos la persona asociada al usuario
-        Persona p = u.getPersona();
-        if (p == null) {
-            throw new Exception("El usuario no tiene una persona asociada.");
-        }
-
-        // 3️⃣ Relacionamos correctamente
-        proyecto.setProgramador(p);
-
-        // 4️⃣ Guardamos
+        
+        System.out.println("Persona encontrada: " + u.getPersona().getCedula()); 
+        proyecto.setProgramador(u.getPersona());
+        
         proyectoDAO.insert(proyecto);
     }
 
-    // Actualizar proyecto
-    public void actualizarProyecto(Proyecto proyecto) {
+    public void actualizarProyecto(Proyecto proyecto) throws Exception {
         proyectoDAO.update(proyecto);
     }
 
-    // Eliminar
     public void eliminarProyecto(int codigo) {
         proyectoDAO.delete(codigo);
     }
 
-    // Listar todos
     public List<Proyecto> listarTodos() {
         return proyectoDAO.getAll();
     }
 
-    // Listar por programador
-    public List<Proyecto> listarPorProgramador(String correoUsuario) {
-        return proyectoDAO.getProyectosPorUsuario(correoUsuario);
+    public List<Proyecto> listarPorProgramador(String cedula) {
+        return proyectoDAO.getProyectosPorUsuario(cedula);
     }
 }

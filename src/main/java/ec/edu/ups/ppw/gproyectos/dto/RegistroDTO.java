@@ -39,8 +39,8 @@ public class RegistroDTO implements Serializable {
     public void setApellido(String apellido) { 
         this.apellido = apellido; 
     }
-    public String getTelefono() { 
-        return telefono; 
+    public String getTelefono() {
+        return telefono; // Asegúrate de devolver la variable real
     }
     public void setTelefono(String telefono) { 
         this.telefono = telefono; 

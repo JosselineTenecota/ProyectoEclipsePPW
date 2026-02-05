@@ -4,9 +4,7 @@ import java.util.List;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
-// IMPORTANTE: Si moviste tus entidades al paquete .model, ajusta este import:
-// import ec.edu.ups.ppw.gproyectos.model.Proyecto;
+import jakarta.persistence.TypedQuery;
 import ec.edu.ups.ppw.gproyectos.Proyecto;
 
 @Stateless
@@ -15,46 +13,55 @@ public class ProyectoDAO {
     @PersistenceContext
     private EntityManager em;
 
-    // Crear
+    /**
+     * Inserta un nuevo proyecto. 
+     * Se usa merge en lugar de persist para evitar errores si la Persona 
+     * vinculada ya existe en el contexto de persistencia.
+     */
     public void insert(Proyecto proyecto) {
-        em.persist(proyecto);
+        em.merge(proyecto);
     }
 
-    // Actualizar
+    /**
+     * Actualiza un proyecto existente.
+     */
     public void update(Proyecto proyecto) {
         em.merge(proyecto);
     }
 
-    // Leer por id
+    /**
+     * Lee un proyecto por su código (ID).
+     */
     public Proyecto read(int codigo) {
-        Proyecto p = em.find(Proyecto.class, codigo);
-        return p;
+        return em.find(Proyecto.class, codigo);
     }
 
-    // Eliminar
+    /**
+     * Elimina un proyecto por su código.
+     */
     public void delete(int codigo) {
-        Proyecto p = em.find(Proyecto.class, codigo);
+        Proyecto p = read(codigo);
         if (p != null) {
             em.remove(p);
         }
     }
 
-    // Listar todos
+    /**
+     * Obtiene todos los proyectos registrados.
+     */
     public List<Proyecto> getAll() {
         String jpql = "SELECT p FROM Proyecto p";
-        Query q = em.createQuery(jpql, Proyecto.class);
-        return q.getResultList();
+        return em.createQuery(jpql, Proyecto.class).getResultList();
     }
 
-    // -------------------------------------------------------
-    // ESTE ES EL MÉTODO QUE TE FALTABA
-    // -------------------------------------------------------
+    /**
+     * Obtiene los proyectos filtrados por la cédula del programador.
+     * @param cedula La cédula de la Persona vinculada.
+     */
     public List<Proyecto> getProyectosPorUsuario(String cedula) {
-        // La consulta asume que Proyecto tiene 'programador' (Usuario) 
-        // y Usuario tiene 'persona' (Persona) donde está la 'cedula'.
-        String jpql = "SELECT p FROM Proyecto p WHERE p.programador.persona.cedula = :cedula";
-        
-        Query q = em.createQuery(jpql, Proyecto.class);
+        // Se accede a p.programador.cedula porque en Persona.java el atributo es 'cedula'
+        String jpql = "SELECT p FROM Proyecto p WHERE p.programador.cedula = :cedula";
+        TypedQuery<Proyecto> q = em.createQuery(jpql, Proyecto.class);
         q.setParameter("cedula", cedula);
         return q.getResultList();
     }
